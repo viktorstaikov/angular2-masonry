@@ -9,6 +9,7 @@ import {
     Output,
     ElementRef,
     EventEmitter,
+    NgZone,
 } from '@angular/core';
 
 // import * as masonry from 'masonry-layout';
@@ -23,7 +24,8 @@ import { MasonryOptions } from './masonry-options';
 export class AngularMasonry implements OnInit, OnDestroy {
 
     constructor(
-        private _element: ElementRef
+        private _element: ElementRef,
+        private zone: NgZone
     ) { }
 
     public _msnry: any;
@@ -77,8 +79,13 @@ export class AngularMasonry implements OnInit, OnDestroy {
     }
 
     public layout() {
-        setTimeout(() => {
-            this._msnry.layout();
+        // setTimeout(() => {
+        //     this._msnry.layout();
+        // });
+        this.zone.run(() => {
+            setTimeout(() => {
+                this._msnry.layout();
+            });
         });
 
         // console.log('AngularMasonry:', 'Layout');
@@ -86,26 +93,26 @@ export class AngularMasonry implements OnInit, OnDestroy {
 
     // public add(element: HTMLElement, prepend: boolean = false) {
     public add(element: HTMLElement) {
-        
+
         var isFirstItem = false;
 
         // Check if first item
-        if(this._msnry.items.length === 0){
+        if (this._msnry.items.length === 0) {
             isFirstItem = true;
         }
 
         if (this.useImagesLoaded) {
             imagesLoaded(element, (instance: any) => {
                 this._element.nativeElement.appendChild(element);
-                
+
                 // Tell Masonry that a child element has been added
                 this._msnry.appended(element);
 
                 // layout if first item
-                if(isFirstItem) this.layout();
+                if (isFirstItem) this.layout();
             });
 
-            try{this._element.nativeElement.removeChild(element)}catch(err){};
+            try { this._element.nativeElement.removeChild(element) } catch (err) { };
         }
         else {
             // Tell Masonry that a child element has been added
